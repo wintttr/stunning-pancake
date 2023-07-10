@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace WinFormsApp1
 {
-
     public enum ControlType { Credit, Exam };
     public class Semester
     {
