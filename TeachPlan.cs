@@ -8,9 +8,19 @@ namespace WinFormsApp1
 {
     public class TeachPlan
     {
-        public string Name { get; init; }
-        public string TrainingDirection { get; init; }
-        public string Profile { get; init; }
-        public string Qualification { get; init; }
+        public TeachPlan(string name, string trainDir, string prof, string qual)
+        {
+            Name = name;
+            TrainingDirection = trainDir;
+            Profile = prof;
+            Qualification = qual;
+        }
+
+        public string Name { get; private init; }
+        public string TrainingDirection { get; private init; }
+        public string Profile { get; private init; }
+        public string Qualification { get; private init; }
+
+        public List<Discipline> Disciplines { get; } = new();
     }
 }

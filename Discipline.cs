@@ -13,7 +13,7 @@ namespace WinFormsApp1
             Name = name;
         }
 
-        public string Name { get; init; }
+        public string Name { get; private init; }
         public List<Semester> Semesters { get; } = new();
     }
 }
