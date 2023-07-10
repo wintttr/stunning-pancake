@@ -29,5 +29,13 @@ namespace WinFormsApp1
         {
             _disciplines.Add(d);
         }
+
+        public void Add(ICollection<Discipline> disciplines)
+        {
+            foreach(var d in disciplines)
+            {
+                Add(d);
+            }
+        }
     }
 }

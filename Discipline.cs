@@ -18,6 +18,12 @@ namespace WinFormsApp1
             _semesters = new();
         }
 
+        public Discipline(string name, ICollection<Semester> semesters)
+        {
+            Name = name;
+            _semesters = new(semesters);
+        }
+
         public string Name { get; private init; }
         public ReadOnlyCollection<Semester> Semesters => _semesters.AsReadOnly();
 

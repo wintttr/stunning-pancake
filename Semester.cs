@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WinFormsApp1
 {
-    public enum ControlType { Credit, Exam };
+    public enum ControlType { Report, Exam };
     public class Semester
     {
         public Semester(int semesterNumber) 
@@ -26,11 +26,16 @@ namespace WinFormsApp1
         public int IKR { get; init; } = 0;
 
         // Самостоятельная работа
+
+        public int SR { get; init; } = 0; // Временно
         public int CourseWork { get; init; } = 0;
         public int MatDev { get; init; } = 0;
         public int IndivTasks { get; init; } = 0;
         public int Essay { get; init; } = 0;
         public int CurrentControl { get; init; } = 0;
+
+        // ЗЕ, зачетные единицы
+        public int ZE { get; init; } = 0;
 
         // Контроль
         public ControlType Control { get; init; }
