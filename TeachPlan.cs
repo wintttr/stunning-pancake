@@ -11,9 +11,8 @@ namespace WinFormsApp1
     {
         private List<Discipline> _disciplines;
 
-        public TeachPlan(string name, string trainDir, string prof, string qual)
+        public TeachPlan(string trainDir, string prof, string qual)
         {
-            Name = name;
             TrainingDirection = trainDir;
             Profile = prof;
             Qualification = qual;
@@ -21,7 +20,6 @@ namespace WinFormsApp1
             _disciplines = new();
         }
 
-        public string Name { get; private init; }
         public string TrainingDirection { get; private init; }
         public string Profile { get; private init; }
         public string Qualification { get; private init; }
