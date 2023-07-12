@@ -27,12 +27,12 @@ namespace WinFormsApp1
 
         // Самостоятельная работа
 
-        public double SR { get; init; } = 0; // Временно
-        public double CourseWork { get; init; } = 0;
-        public double MatDev { get; init; } = 0;
-        public double IndivTasks { get; init; } = 0;
-        public double Essay { get; init; } = 0;
-        public double CurrentControl { get; init; } = 0;
+        public double SR { get; init; } = 0; // НЕ Временно
+        public double CourseWork = 0;
+        public double MatDev => (SR - CurrentControl) / 2;
+        public double IndivTasks => (SR - CurrentControl) / 2;
+        public double Essay = 0;
+        public double CurrentControl => 2 + (SR - Math.Floor(SR));
 
         // ЗЕ, зачетные единицы
         public double ZE { get; init; } = 0;
