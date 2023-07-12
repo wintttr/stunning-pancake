@@ -17,28 +17,28 @@ namespace WinFormsApp1
         public int Num { get; private init; }
 
         // Аудиторные занятия
-        public int Lectures { get; init; } = 0;
-        public int Labs { get; init; } = 0;
-        public int Seminars { get; init; } = 0;
+        public double Lectures { get; init; } = 0;
+        public double Labs { get; init; } = 0;
+        public double Seminars { get; init; } = 0;
 
         // Иная контактная работа
-        public int KSR { get; init; } = 0;
-        public int IKR { get; init; } = 0;
+        public double KSR { get; init; } = 0;
+        public double IKR { get; init; } = 0;
 
         // Самостоятельная работа
 
-        public int SR { get; init; } = 0; // Временно
-        public int CourseWork { get; init; } = 0;
-        public int MatDev { get; init; } = 0;
-        public int IndivTasks { get; init; } = 0;
-        public int Essay { get; init; } = 0;
-        public int CurrentControl { get; init; } = 0;
+        public double SR { get; init; } = 0; // Временно
+        public double CourseWork { get; init; } = 0;
+        public double MatDev { get; init; } = 0;
+        public double IndivTasks { get; init; } = 0;
+        public double Essay { get; init; } = 0;
+        public double CurrentControl { get; init; } = 0;
 
         // ЗЕ, зачетные единицы
-        public int ZE { get; init; } = 0;
+        public double ZE { get; init; } = 0;
 
         // Контроль
         public ControlType Control { get; init; }
-        public int ExamPrep { get; init; } = 0;
+        public double ExamPrep { get; init; } = 0;
     }
 }

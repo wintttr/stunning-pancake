@@ -12,19 +12,19 @@ namespace WinFormsApp1
     {
         private List<Semester> _semesters;
 
-        public Discipline(string name)
+        public Discipline(string index, string name, ICollection<Semester>? semesters = null)
         {
+            Index = index;
             Name = name;
-            _semesters = new();
-        }
 
-        public Discipline(string name, ICollection<Semester> semesters)
-        {
-            Name = name;
-            _semesters = new(semesters);
+            if (semesters == null)
+                _semesters = new();
+            else
+                _semesters = new(semesters);
         }
 
         public string Name { get; private init; }
+        public string Index { get; private init; }
         public ReadOnlyCollection<Semester> Semesters => _semesters.AsReadOnly();
 
         public void Add(Semester s)

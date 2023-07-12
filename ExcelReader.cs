@@ -3,6 +3,7 @@ using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -40,6 +41,12 @@ namespace WinFormsApp1
             _filePath = path;
         }
     
+        private bool IsCellEmpty(ExcelWorksheet ws, int row, int col)
+        {
+            var value = ws.Cells[row, col].Value;
+            return value == null || value is string v && v.Trim() == "";
+        }
+
         private string MakeTextPlain(string s)
         {
             StringBuilder result = new(s);
@@ -49,12 +56,10 @@ namespace WinFormsApp1
 
         private string GetPlainText(ExcelWorksheet ws, int row, int col)
         {
-            return MakeTextPlain(ws.Cells[row, col].GetValue<string>());
-        }
-
-        private string GetPlainText(ExcelWorksheet ws, string address)
-        {
-            return MakeTextPlain(ws.Cells[address].GetValue<string>());
+            if (IsCellEmpty(ws, row, col))
+                return "";
+            else
+                return MakeTextPlain(ws.Cells[row, col].GetValue<string>());
         }
 
         public TeachPlan GetPlan()
@@ -63,15 +68,15 @@ namespace WinFormsApp1
             using (var package = new ExcelPackage(new FileInfo(_filePath)))
             {
                 var ws = package.Workbook.Worksheets["Титул"];
-                trainDir = GetPlainText(ws, "D29");
-                prof = GetPlainText(ws, "D30");
-                qual = GetPlainText(ws, "C40");
+                trainDir = GetPlainText(ws, 29, 4);
+                prof = GetPlainText(ws, 30, 4);
+                qual = GetPlainText(ws, 40, 3);
             }
 
             return new(trainDir, prof, qual); 
         }
 
-        static private ICollection<int> DivideNumbers(string s)
+        static private HashSet<int> DivideNumbers(string s)
         {
             HashSet<int> result = new();
 
@@ -84,26 +89,50 @@ namespace WinFormsApp1
             return result;
         }
 
-        public Semester GetSemester(ExcelWorksheet ws, int semNum, int row)
+        private Semester GetSemester(ExcelWorksheet ws, ControlType ct, int semNum, int row)
         {
-            ControlType ct;
+            int GetCharCol(int offset)
+            {
+                return kSemBeg + kCharCount * (semNum - 1) + offset;
+            }
 
-            if (DivideNumbers(GetPlainText(ws, row, kExam)).Contains(semNum))
+            double GetSemChar(int offset)
             {
-                ct = ControlType.Exam;
-            }
-            else if (DivideNumbers(GetPlainText(ws, row, kReport)).Contains(semNum))
-            {
-                ct = ControlType.Report;
-            }
-            else if (DivideNumbers(GetPlainText(ws, row, kMarkedReport)).Contains(semNum))
-            {
-                ct = ControlType.Report;
-            }
-            else
-                throw new Exception("Semester number doesn't exists");
+                var value = GetPlainText(ws, row, GetCharCol(offset));
 
-            return new(semNum);
+                if (value == "")
+                    return 0;
+                else
+                {
+                    IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                    return Double.Parse(value, formatter);
+                }
+            }
+
+            double ZE = GetSemChar(kZEOffset);
+            double Lectures = GetSemChar(kLecOffset);
+            double Labs = GetSemChar(kLabOffset);
+            double Seminars = GetSemChar(kSemOffset);
+            double KSR = GetSemChar(kKSROffset);
+            double IKR = GetSemChar(kIKROffset);
+            double SR = GetSemChar(kSROffset);
+
+            double Control = 0;
+            if(ct == ControlType.Exam)
+                Control = GetSemChar(kControlOffset);
+
+            return new(semNum)
+            {
+                ZE = ZE,
+                Lectures = Lectures,
+                Labs = Labs,
+                Seminars = Seminars,
+                KSR = KSR,
+                IKR = IKR,
+                SR = SR,
+                Control = ct,
+                ExamPrep = Control
+            };
         }
 
         public ICollection<Discipline> GetDisciplines()
@@ -124,7 +153,25 @@ namespace WinFormsApp1
                     if (ws.Cells[row, 3].GetValue<string>() == null)
                         break;
 
-                    disciplines.Add(new(GetPlainText(ws, row, kName)));
+                    string index = GetPlainText(ws, row, kIndex);
+                    string name = GetPlainText(ws, row, kName);
+
+                    List<Semester> semesters = new();
+
+                    var exams = DivideNumbers(GetPlainText(ws, row, kExam));
+                    var reports = DivideNumbers(GetPlainText(ws, row, kReport));
+
+                    reports.UnionWith(DivideNumbers(GetPlainText(ws, row, kMarkedReport)));
+                    reports.ExceptWith(exams);
+
+
+                    foreach (int semNum in exams)
+                        semesters.Add(GetSemester(ws, ControlType.Exam, semNum, row));
+
+                    foreach (int semNum in reports)
+                        semesters.Add(GetSemester(ws, ControlType.Report, semNum, row));
+
+                    disciplines.Add(new(index, name, semesters));
                 }
             }
 
