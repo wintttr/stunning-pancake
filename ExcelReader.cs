@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WinFormsApp1
@@ -20,6 +21,9 @@ namespace WinFormsApp1
         const int kReport = 6;
         const int kMarkedReport = 7;
 
+        const int kTotalZE = 10;
+        const int kHoursPerZE = 11;
+
         const int kCharCount = 8;
         const int kSemBeg = 18;
 
@@ -31,6 +35,8 @@ namespace WinFormsApp1
         const int kIKROffset = 5;
         const int kSROffset = 6;
         const int kControlOffset = 7;
+
+        const int kCompetencies = 84;
 
         private string _filePath;
 
@@ -68,9 +74,13 @@ namespace WinFormsApp1
             using (var package = new ExcelPackage(new FileInfo(_filePath)))
             {
                 var ws = package.Workbook.Worksheets["Титул"];
-                trainDir = GetPlainText(ws, 29, 4);
+
+                Regex trainDirRegex = new(@"Направление подготовки\s*(.*)");
+                trainDir = trainDirRegex.Match(GetPlainText(ws, 29, 4)).Groups[1].Value.Trim();
                 prof = GetPlainText(ws, 30, 4);
-                qual = GetPlainText(ws, 40, 3);
+
+                Regex qualRegex = new(@"Квалификация:\s*(.*)");
+                qual = qualRegex.Match(GetPlainText(ws, 40, 3)).Groups[1].Value.Trim();
             }
 
             return new(trainDir, prof, qual); 
@@ -89,6 +99,17 @@ namespace WinFormsApp1
             return result;
         }
 
+        private double ConvertToDouble(string s)
+        {
+            if (s == "")
+                return 0;
+            else
+            {
+                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                return Double.Parse(s, formatter);
+            }
+        }
+
         private Semester GetSemester(ExcelWorksheet ws, ControlType ct, int semNum, int row)
         {
             int GetCharCol(int offset)
@@ -100,13 +121,7 @@ namespace WinFormsApp1
             {
                 var value = GetPlainText(ws, row, GetCharCol(offset));
 
-                if (value == "")
-                    return 0;
-                else
-                {
-                    IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-                    return Double.Parse(value, formatter);
-                }
+                return ConvertToDouble(value);
             }
 
             double ZE = GetSemChar(kZEOffset);
@@ -150,13 +165,14 @@ namespace WinFormsApp1
                     if (ws.Cells[row, 3].Merge)
                         continue;
 
-                    if (ws.Cells[row, 3].GetValue<string>() == null)
+                    if (IsCellEmpty(ws, row, 3))
                         break;
 
                     string index = GetPlainText(ws, row, kIndex);
                     string name = GetPlainText(ws, row, kName);
 
-                    List<Semester> semesters = new();
+                    double ze = ConvertToDouble(GetPlainText(ws, row, kTotalZE));
+                    double hoursPerZe = ConvertToDouble(GetPlainText(ws, row, kHoursPerZE));
 
                     var exams = DivideNumbers(GetPlainText(ws, row, kExam));
                     var reports = DivideNumbers(GetPlainText(ws, row, kReport));
@@ -164,14 +180,19 @@ namespace WinFormsApp1
                     reports.UnionWith(DivideNumbers(GetPlainText(ws, row, kMarkedReport)));
                     reports.ExceptWith(exams);
 
-
+                    List<Semester> semesters = new();
                     foreach (int semNum in exams)
                         semesters.Add(GetSemester(ws, ControlType.Exam, semNum, row));
 
                     foreach (int semNum in reports)
                         semesters.Add(GetSemester(ws, ControlType.Report, semNum, row));
 
-                    disciplines.Add(new(index, name, semesters));
+                    List<string> competencies = new(GetPlainText(ws, row, kCompetencies).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+                    disciplines.Add(new(index, name, semesters, competencies) { 
+                        ZETotal = ze, 
+                        HoursPerZE = hoursPerZe
+                    });
                 }
             }
 
