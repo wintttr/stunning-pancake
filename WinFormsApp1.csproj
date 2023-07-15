@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.6" />
+    <PackageReference Include="FreeSpire.Doc" Version="11.6.0" />
   </ItemGroup>
 
 </Project>
