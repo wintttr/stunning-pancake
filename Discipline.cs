@@ -38,6 +38,10 @@ namespace WinFormsApp1
             _competencies = new(competencies);
         }
 
+        public override string ToString()
+        {
+            return $"{Index} \"{Name}\"";
+        }
         public ReadOnlyCollection<Semester> Semesters => _semesters.AsReadOnly();
         public ReadOnlyCollection<string> Competencies => _competencies.AsReadOnly();
 
