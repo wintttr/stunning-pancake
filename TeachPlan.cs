@@ -9,33 +9,23 @@ namespace WinFormsApp1
 {
     public class TeachPlan
     {
-        private List<Discipline> _disciplines;
-
-        public TeachPlan(string trainDir, string prof, string qual)
+        public TeachPlan(string trainDir, string prof, string qual, ICollection<Discipline> disciplines, IDictionary<string, string> compDisc)
         {
             TrainingDirection = trainDir;
             Profile = prof;
             Qualification = qual;
 
-            _disciplines = new();
+            _disciplines = new(disciplines);
+            _compDisc = new(compDisc);
         }
-
         public string TrainingDirection { get; private init; }
         public string Profile { get; private init; }
         public string Qualification { get; private init; }
-        public ReadOnlyCollection<Discipline> Disciplines => _disciplines.AsReadOnly();
 
-        public void Add(Discipline d)
-        {
-            _disciplines.Add(d);
-        }
+        public IReadOnlyCollection<Discipline> Disciplines => _disciplines;
+        public IReadOnlyDictionary<string, string> CompDisc => _compDisc;
 
-        public void Add(ICollection<Discipline> disciplines)
-        {
-            foreach(var d in disciplines)
-            {
-                Add(d);
-            }
-        }
+        private List<Discipline> _disciplines;
+        private Dictionary<string, string> _compDisc; 
     }
 }
