@@ -37,8 +37,8 @@ namespace WinFormsApp1
             _competencies = new(competencies);
         }
 
-        public IReadOnlyCollection<Semester> Semesters => _semesters;
-        public IReadOnlyCollection<string> Competencies => _competencies;
+        public ReadOnlyCollection<Semester> Semesters => _semesters.AsReadOnly();
+        public ReadOnlyCollection<string> Competencies => _competencies.AsReadOnly();
 
         private List<Semester> _semesters;
         private List<string> _competencies;
