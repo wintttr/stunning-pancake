@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -12,6 +13,11 @@ using System.Threading.Tasks;
 
 namespace WinFormsApp1
 {
+    class ParseErrorException : ApplicationException
+    {
+        public ParseErrorException(string? s) : base(s) { }
+    }
+
     class ExcelReader
     {
         public ExcelReader(string path)
@@ -28,31 +34,47 @@ namespace WinFormsApp1
             var ws = package.Workbook.Worksheets["Титул"];
 
             Regex trainDirRegex = new(@"Направление подготовки\s*(.*)");
-            string trainDir = trainDirRegex.Match(GetPlainText(ws, 29, 4)).Groups[1].Value.Trim();
-            string prof = GetPlainText(ws, 30, 4);
-
             Regex qualRegex = new(@"Квалификация:\s*(.*)");
-            string qual = qualRegex.Match(GetPlainText(ws, 40, 3)).Groups[1].Value.Trim();
 
-            return new(trainDir, prof, qual, 
+            string rawTrainDir = GetStringFromCell(ws.Cells[29, 4]) ?? 
+                                            throw new ParseErrorException("Train direction not found");
+
+            string profile = GetStringFromCell(ws.Cells[30, 4]) ?? 
+                                            throw new ParseErrorException("Profile not found");
+
+            string rawQualification = GetStringFromCell(ws.Cells[40, 3]) ?? 
+                                            throw new ParseErrorException("Qualification not found");
+
+            string trainDir = MatchToRegex(trainDirRegex, rawTrainDir);
+            string qualification = MatchToRegex(qualRegex, rawQualification);
+
+            return new(trainDir, profile, qualification,
                        GetDisciplines(package),
                        GetCompDescriptions(package));
         }
 
-        static private HashSet<int> DivideNumbers(string s)
+        static private string MatchToRegex(Regex regex, string pattern)
         {
-            int CharToDigit(char c) 
+            return regex.Match(pattern).Groups[1].Value.Trim();
+        }
+
+        static private HashSet<int> DivideNumbers(string? s)
+        {
+            static int CharToDigit(char c) 
             {
                 if (c > '9' || c < '0') throw new Exception("Not a number");
                 else return c - '0';
             }
 
-            return new(s.Select(c => CharToDigit(c)));
+            if (s is null)
+                return new();
+            else
+                return new(s.Select(c => CharToDigit(c)));
         }
 
-        static private bool IsCellEmpty(ExcelWorksheet ws, int row, int col)
+        static private bool IsCellEmpty(ExcelRange cellRange)
         {
-            var value = ws.Cells[row, col].Value;
+            var value = cellRange.Value;
             return value == null || value is string v && v.Trim() == "";
         }
 
@@ -63,23 +85,26 @@ namespace WinFormsApp1
             return result.ToString().Trim();
         }
 
-        static private string GetPlainText(ExcelWorksheet ws, int row, int col)
+        static private string? GetStringFromCell(ExcelRange cellRange)
         {
-            if (IsCellEmpty(ws, row, col))
-                return "";
+            if (IsCellEmpty(cellRange))
+                return null;
             else
-                return MakeTextPlain(ws.Cells[row, col].GetValue<string>());
+                return MakeTextPlain(cellRange.GetValue<string>());
         }
 
         static private double ConvertToDouble(string s)
         {
-            if (s == "")
-                return 0;
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            return Double.Parse(s, formatter);
+        }
+
+        static private double? GetDoubleFromCell(ExcelRange cellRange)
+        {
+            if (IsCellEmpty(cellRange))
+                return null;
             else
-            {
-                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-                return Double.Parse(s, formatter);
-            }
+                return ConvertToDouble(cellRange.GetValue<string>());
         }
 
         static private Semester GetSemester(ExcelWorksheet ws, ControlType ct, int semNum, int row)
@@ -101,12 +126,7 @@ namespace WinFormsApp1
                 return kSemBeg + kCharCount * (semNum - 1) + offset;
             }
 
-            double GetSemChar(int offset)
-            {
-                var value = GetPlainText(ws, row, GetCharCol(offset));
-
-                return ConvertToDouble(value);
-            }
+            double GetSemChar(int offset) => GetDoubleFromCell(ws.Cells[row, GetCharCol(offset)]) ?? 0;
 
             double ZE = GetSemChar(kZEOffset);
             double Lectures = GetSemChar(kLecOffset);
@@ -158,18 +178,22 @@ namespace WinFormsApp1
                 if (ws.Cells[row, 3].Merge)
                     continue;
 
-                if (IsCellEmpty(ws, row, 3))
+                if (IsCellEmpty(ws.Cells[row, 3]))
                     break;
 
-                string index = GetPlainText(ws, row, kIndex);
-                string name = GetPlainText(ws, row, kName);
+                string index = GetStringFromCell(ws.Cells[row, kIndex]) ?? 
+                                            throw new ParseErrorException("Discipline index not found");
 
-                double hoursPerZe = ConvertToDouble(GetPlainText(ws, row, kHoursPerZE));
+                string name = GetStringFromCell(ws.Cells[row, kName]) ?? 
+                                            throw new ParseErrorException("Discipline name not found");
 
-                var exams = DivideNumbers(GetPlainText(ws, row, kExam));
-                var reports = DivideNumbers(GetPlainText(ws, row, kReport));
+                double hoursPerZe = GetDoubleFromCell(ws.Cells[row, kHoursPerZE]) ?? 
+                                            throw new ParseErrorException("Hours per ZE not found");
 
-                reports.UnionWith(DivideNumbers(GetPlainText(ws, row, kMarkedReport)));
+                var exams = DivideNumbers(GetStringFromCell(ws.Cells[row, kExam]));
+                var reports = DivideNumbers(GetStringFromCell(ws.Cells[row, kReport]));
+
+                reports.UnionWith(DivideNumbers(GetStringFromCell(ws.Cells[row, kMarkedReport])));
                 reports.ExceptWith(exams);
 
                 List<Semester> semesters = new();
@@ -179,7 +203,10 @@ namespace WinFormsApp1
                 foreach (int semNum in reports)
                     semesters.Add(GetSemester(ws, ControlType.Report, semNum, row));
 
-                List<string> competencies = new(GetPlainText(ws, row, kCompetencies).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+                string rawCompetenciesString = GetStringFromCell(ws.Cells[row, kCompetencies]) ?? 
+                                            throw new ParseErrorException("Competencies not found");
+
+                List<string> competencies = new(rawCompetenciesString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
                 disciplines.Add(new(index, name, semesters, competencies) {
                     HoursPerZE = hoursPerZe
@@ -199,15 +226,19 @@ namespace WinFormsApp1
             const int indexColumn = 3;
             const int descriptionColumn = 4;
 
-
             for (int row = firstRow; ; row++)
             {
-                if (IsCellEmpty(ws, row, indexColumn))
+                if (IsCellEmpty(ws.Cells[row, indexColumn]))
                     break;
 
                 else if (ws.Cells[row, numberColumn].Merge) 
                 {
-                    dict.Add(GetPlainText(ws, row, numberColumn), GetPlainText(ws, row, descriptionColumn));
+                    string compNumber = GetStringFromCell(ws.Cells[row, numberColumn]) ?? 
+                                                throw new ParseErrorException("Competency number not found");
+                    string compDescription = GetStringFromCell(ws.Cells[row, descriptionColumn]) ?? 
+                                                throw new ParseErrorException("Competency description not found");
+
+                    dict.Add(compNumber, compDescription);
                 }
             }
 
