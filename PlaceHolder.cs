@@ -48,10 +48,10 @@ namespace WinFormsApp1
                 {"Qualification", _teachPlan.Qualification},
                 {"Name", discipline.Name},
                 {"index", Convert.ToString(discipline.Index)},
-                {"ZETotal", Convert.ToString(discipline.ZETotal)},
+                {"ZETotal", Convert.ToString(discipline.TotalZE)},
                 {"HoursPerZE", Convert.ToString(discipline.HoursPerZE)}
             };
-            //Заполнение таблицы (надо доделать общую трудоемкость)
+            //Заполнение таблицы
             for(int i=1; i < 5; i++)
             {
                 if(i-1 < discipline.Semesters.Count)
@@ -64,29 +64,42 @@ namespace WinFormsApp1
                 }
             }
             //Заполнение первой колонки (итог по семестрам)
-            //_placeDict.Add($"Num", Convert.ToString());
-            //_placeDict.Add($"Lectures", Convert.ToString());
-            //_placeDict.Add($"Labs", Convert.ToString());
-            //_placeDict.Add($"Seminars", Convert.ToString());
-            //_placeDict.Add($"KSR", Convert.ToString());
-            //_placeDict.Add($"IKR", Convert.ToString());
-            //_placeDict.Add($"SR", Convert.ToString());
-            //_placeDict.Add($"CoursWorkK", Convert.ToString());
-            //_placeDict.Add($"MatDev", Convert.ToString());
-            //_placeDict.Add($"IndivTasks", Convert.ToString());
-            //_placeDict.Add($"Essay", Convert.ToString());
-            //_placeDict.Add($"CurrentControl", Convert.ToString());
-            //_placeDict.Add($"ControlType{num}", semester.Control);
-            //_placeDict.Add($"ExamPrep", Convert.ToString());
+            _placeDict.Add("ClassRoom", Convert.ToString(discipline.TotalClassroom));
+            _placeDict.Add("Lectures", Convert.ToString(discipline.TotalLectures));
+            _placeDict.Add("Labs", Convert.ToString(discipline.TotalLabs));
+            _placeDict.Add("Seminars", Convert.ToString(discipline.TotalSeminars));
+            _placeDict.Add("KSR", Convert.ToString(discipline.TotalKSR));
+            _placeDict.Add("IKR", Convert.ToString(discipline.TotalIKR));
+            _placeDict.Add("SR", Convert.ToString(discipline.TotalSR));
+            _placeDict.Add("CoursWorkK", Convert.ToString(discipline.TotalCourseWork));
+            _placeDict.Add("MatDev", Convert.ToString(discipline.TotalMatDev));
+            _placeDict.Add("IndivTasks", Convert.ToString(discipline.TotalIndivTasks));
+            _placeDict.Add("Essay", Convert.ToString(discipline.TotalEssay));
+            _placeDict.Add("CurrentControl", Convert.ToString(discipline.TotalCurrentControl));
+            _placeDict.Add("ControlType", HowIsControl(discipline));
+            _placeDict.Add("ExamPrep", Convert.ToString(discipline.TotalExamPrep));
+            _placeDict.Add("GeneralLabor", Convert.ToString(discipline.TotalGeneralLabor));
+            _placeDict.Add("Classroom", Convert.ToString(discipline.TotalClassroom));
+            _placeDict.Add("ZE", Convert.ToString(discipline.TotalZE));
 
             //Тут будет вставка компетенций и дублирование той таблицы 
+            //Получение таблицы 
+            Table compitionTable = (Table)document.Sections[0].Tables[0];
+            //Добавить 
+            for(int i = 1; i < discipline.Competencies.Count+1; i++)//0вая строка это шапка
+            {
+                compitionTable.AddRow();
+                compitionTable.Rows[i].Cells[0].AddParagraph().AppendText(discipline.Competencies[i]);
+                compitionTable.Rows[i].Cells[1].AddParagraph().AppendText(_teachPlan.CompDisc[discipline.Competencies[i]]);
+                compitionTable.ApplyHorizontalMerge(i, 0, 1);
+            }
 
             //Замена тегов на значение в шаблоне
-            foreach(String key in _placeDict.Keys)
+            foreach (String key in _placeDict.Keys)
             {
                 document.Replace(key, _placeDict[key], false, true);
             }
-            document.SaveToFile(_filePath);
+            document.SaveToFile(_filePath+$"\\{discipline.Name}.docx");
             document.Close();
         }
 
@@ -104,8 +117,12 @@ namespace WinFormsApp1
             _placeDict.Add($"IndivTasks{num}", Convert.ToString(semester.IndivTasks));
             _placeDict.Add($"Essay{num}", Convert.ToString(semester.Essay));
             _placeDict.Add($"CurrentControl{num}", Convert.ToString(semester.CurrentControl));
-            //_placeDict.Add($"ControlType{num}", semester.Control);
+            _placeDict.Add($"ControlType{num}", semester.Control == ControlType.Exam ? "экзамен" : "зачет");
             _placeDict.Add($"ExamPrep{num}", Convert.ToString(semester.ExamPrep));
+            _placeDict.Add($"GeneralLabor{num}", Convert.ToString(semester.GeneralLabor));
+            _placeDict.Add($"Classroom{num}", Convert.ToString(semester.Classroom));
+            _placeDict.Add($"ZE{num}", Convert.ToString(semester.ZE));
+
         }
         private void EmptySemester(int num)
         {
@@ -123,6 +140,23 @@ namespace WinFormsApp1
             _placeDict.Add($"CurrentControl{num}","-");
             _placeDict.Add($"ControlType{num}", "-");
             _placeDict.Add($"ExamPrep{num}", "-");
+            _placeDict.Add($"GeneralLabor{num}", "-");
+            _placeDict.Add($"Classroom{num}", "-");
+            _placeDict.Add($"ZE{num}", "-");
         }
+
+        //экзамен или не?
+        private string HowIsControl(Discipline discipline)
+        {
+            foreach(Semester sem in discipline.Semesters)
+            {
+                if(sem.Control == ControlType.Exam)
+                {
+                    return "экзамен";
+                } 
+            }
+            return "зачет";
+        }
+       
     }
 }

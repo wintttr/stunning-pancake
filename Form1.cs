@@ -20,13 +20,26 @@ namespace WinFormsApp1
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                ExcelReader er = new(@"C:\Users\wintttr\Downloads\Test.xlsx");
+                ExcelReader er = new(ofd.FileName);//@"C:\Users\wintttr\Downloads\Test.xlsx");
                 var plan = er.GetPlan();
+                teachPlan = plan;//вапроси?
                 var disciplines = new List<string>(plan.Disciplines.Select(d => d.Name));
 
                 checkedListBox1.Items.Clear();
                 foreach (var d in disciplines)
                     checkedListBox1.Items.Add(d);
+            }
+        }
+
+        public TeachPlan teachPlan;
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            using FolderBrowserDialog fbd = new();
+
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                PlaceHolder ph = new PlaceHolder(teachPlan, fbd.SelectedPath);
             }
         }
     }

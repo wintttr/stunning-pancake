@@ -21,6 +21,7 @@ namespace WinFormsApp1
         public double TotalKSR => Semesters.Sum(sem => sem.KSR);
         public double TotalIKR => Semesters.Sum(sem => sem.IKR);
         public double TotalSR => Semesters.Sum(sem => sem.SR);
+        public double TotalCourseWork => Semesters.Sum(sem => sem.CourseWork);
         public double TotalMatDev => Semesters.Sum(sem => sem.MatDev);
         public double TotalIndivTasks => Semesters.Sum(sem => sem.IndivTasks);
         public double TotalEssay => Semesters.Sum(sem => sem.Essay);

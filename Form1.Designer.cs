@@ -28,62 +28,66 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.SuspendLayout();
+            button1 = new Button();
+            checkedListBox1 = new CheckedListBox();
+            button2 = new Button();
+            label1 = new Label();
+            SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 51);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Загрузить файл";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            button1.Location = new Point(10, 9);
+            button1.Margin = new Padding(3, 2, 3, 2);
+            button1.Name = "button1";
+            button1.Size = new Size(82, 38);
+            button1.TabIndex = 0;
+            button1.Text = "Загрузить файл";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // checkedListBox1
             // 
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(112, 35);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(375, 290);
-            this.checkedListBox1.TabIndex = 1;
+            checkedListBox1.FormattingEnabled = true;
+            checkedListBox1.Location = new Point(98, 26);
+            checkedListBox1.Margin = new Padding(3, 2, 3, 2);
+            checkedListBox1.Name = "checkedListBox1";
+            checkedListBox1.Size = new Size(329, 202);
+            checkedListBox1.TabIndex = 1;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(179, 331);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(253, 29);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Генерация";
-            this.button2.UseVisualStyleBackColor = true;
+            button2.Location = new Point(157, 248);
+            button2.Margin = new Padding(3, 2, 3, 2);
+            button2.Name = "button2";
+            button2.Size = new Size(221, 22);
+            button2.TabIndex = 2;
+            button2.Text = "Генерация";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(112, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(140, 20);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Список дисциплин";
+            label1.AutoSize = true;
+            label1.Location = new Point(98, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(112, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Список дисциплин";
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(505, 374);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.checkedListBox1);
-            this.Controls.Add(this.button1);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(442, 280);
+            Controls.Add(label1);
+            Controls.Add(button2);
+            Controls.Add(checkedListBox1);
+            Controls.Add(button1);
+            Margin = new Padding(3, 2, 3, 2);
+            Name = "Form1";
+            Text = "Form1";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
