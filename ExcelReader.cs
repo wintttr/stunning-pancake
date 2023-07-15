@@ -29,6 +29,8 @@ namespace WinFormsApp1
 
         public TeachPlan GetPlan()
         {
+            static string MatchToRegex(Regex regex, string pattern) => regex.Match(pattern).Groups[1].Value.Trim();
+
             using var package = new ExcelPackage(new FileInfo(_filePath));
 
             var ws = package.Workbook.Worksheets["Титул"];
@@ -51,25 +53,6 @@ namespace WinFormsApp1
             return new(trainDir, profile, qualification,
                        GetDisciplines(package),
                        GetCompDescriptions(package));
-        }
-
-        static private string MatchToRegex(Regex regex, string pattern)
-        {
-            return regex.Match(pattern).Groups[1].Value.Trim();
-        }
-
-        static private HashSet<int> DivideNumbers(string? s)
-        {
-            static int CharToDigit(char c) 
-            {
-                if (c > '9' || c < '0') throw new Exception("Not a number");
-                else return c - '0';
-            }
-
-            if (s is null)
-                return new();
-            else
-                return new(s.Select(c => CharToDigit(c)));
         }
 
         static private bool IsCellEmpty(ExcelRange cellRange)
@@ -156,6 +139,20 @@ namespace WinFormsApp1
 
         static private List<Discipline> GetDisciplines(ExcelPackage excelPackage)
         {
+            static HashSet<int> DivideNumbers(string? s)
+            {
+                static int CharToDigit(char c)
+                {
+                    if (c > '9' || c < '0') throw new Exception("Not a number");
+                    else return c - '0';
+                }
+
+                if (s is null)
+                    return new();
+                else
+                    return new(s.Select(c => CharToDigit(c)));
+            }
+
             const int kIndex = 3;
             const int kName = 4;
 
@@ -187,8 +184,9 @@ namespace WinFormsApp1
                 string name = GetStringFromCell(ws.Cells[row, kName]) ?? 
                                             throw new ParseErrorException("Discipline name not found");
 
-                double hoursPerZe = GetDoubleFromCell(ws.Cells[row, kHoursPerZE]) ?? 
-                                            throw new ParseErrorException("Hours per ZE not found");
+                double hoursPerZe = GetDoubleFromCell(ws.Cells[row, kHoursPerZE]) ?? 0;
+//                                            throw new ParseErrorException("Hours per ZE not found");
+//                                            ДОЛЖНО БЫТЬ, НО НЕТ
 
                 var exams = DivideNumbers(GetStringFromCell(ws.Cells[row, kExam]));
                 var reports = DivideNumbers(GetStringFromCell(ws.Cells[row, kReport]));
@@ -203,8 +201,8 @@ namespace WinFormsApp1
                 foreach (int semNum in reports)
                     semesters.Add(GetSemester(ws, ControlType.Report, semNum, row));
 
-                string rawCompetenciesString = GetStringFromCell(ws.Cells[row, kCompetencies]) ?? 
-                                            throw new ParseErrorException("Competencies not found");
+                string rawCompetenciesString = GetStringFromCell(ws.Cells[row, kCompetencies]) ?? "";
+//                                            throw new ParseErrorException("Competencies not found");
 
                 List<string> competencies = new(rawCompetenciesString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
