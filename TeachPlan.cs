@@ -22,8 +22,8 @@ namespace WinFormsApp1
         public string Profile { get; private init; }
         public string Qualification { get; private init; }
 
-        public IReadOnlyCollection<Discipline> Disciplines => _disciplines;
-        public IReadOnlyDictionary<string, string> CompDisc => _compDisc;
+        public ReadOnlyCollection<Discipline> Disciplines => _disciplines.AsReadOnly();
+        public ReadOnlyDictionary<string, string> CompDisc => new(_compDisc);
 
         private List<Discipline> _disciplines;
         private Dictionary<string, string> _compDisc; 
