@@ -21,7 +21,8 @@ namespace WinFormsApp1
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 ExcelReader er = new(@"C:\Users\wintttr\Downloads\Test.xlsx");
-                var disciplines = new List<string>(er.GetDisciplines().Select(d => d.Name));
+                var plan = er.GetPlan();
+                var disciplines = new List<string>(plan.Disciplines.Select(d => d.Name));
 
                 checkedListBox1.Items.Clear();
                 foreach (var d in disciplines)
