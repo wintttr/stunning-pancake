@@ -147,7 +147,7 @@ namespace WinFormsApp1
 
         private string FormatDouble(double d)
         {
-            return d.ToString("#.##");
+            return d.ToString("0.##");
         }
 
         //экзамен или не?
