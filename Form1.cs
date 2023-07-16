@@ -1,15 +1,18 @@
 using System.Windows.Forms;
+using System.Threading;
+using System.ComponentModel;
 
 namespace WinFormsApp1
 {
     public partial class Form1 : Form
     {
+        private  TeachPlan? teachPlan = null;
+
         public Form1()
         {
             InitializeComponent();
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void loadFileButton_Click(object sender, EventArgs e)
         {
             using OpenFileDialog ofd = new();
 
@@ -20,21 +23,30 @@ namespace WinFormsApp1
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                ExcelReader er = new(ofd.FileName);//@"C:\Users\wintttr\Downloads\Test.xlsx");
-                var plan = er.GetPlan();
-                teachPlan = plan;//вапроси?
-                var disciplines = new List<string>(plan.Disciplines.Select(d => d.Name));
+                try
+                {
+                    ExcelReader er = new(ofd.FileName);
+                    teachPlan = er.GetPlan();
 
-                checkedListBox1.Items.Clear();
-                foreach (var d in disciplines)
-                    checkedListBox1.Items.Add(d);
+                    disciplineCheckedList.Items.Clear();
+                    foreach (var d in teachPlan.Disciplines)
+                        disciplineCheckedList.Items.Add(d);
+                }
+                catch (ParseErrorException ex)
+                {
+                    MessageBox.Show($"Произошла ошибка при разборе файла: {ex.Message}");
+                }
             }
         }
 
-        public TeachPlan teachPlan;
-
-        private void button2_Click(object sender, EventArgs e)
+        private void generateOutputButton_Click(object sender, EventArgs e)
         {
+            if (teachPlan is null)
+            {
+                MessageBox.Show("Файл не загружен.");
+                return;
+            }
+
             using FolderBrowserDialog fbd = new();
 
             if (fbd.ShowDialog() == DialogResult.OK)

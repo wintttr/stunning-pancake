@@ -28,73 +28,75 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            checkedListBox1 = new CheckedListBox();
-            button2 = new Button();
-            label1 = new Label();
-            SuspendLayout();
+            this.loadFileButton = new System.Windows.Forms.Button();
+            this.disciplineCheckedList = new System.Windows.Forms.CheckedListBox();
+            this.generateOutputButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.SuspendLayout();
             // 
-            // button1
+            // loadFileButton
             // 
-            button1.Location = new Point(10, 9);
-            button1.Margin = new Padding(3, 2, 3, 2);
-            button1.Name = "button1";
-            button1.Size = new Size(82, 38);
-            button1.TabIndex = 0;
-            button1.Text = "Загрузить файл";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            this.loadFileButton.Location = new System.Drawing.Point(11, 12);
+            this.loadFileButton.Name = "loadFileButton";
+            this.loadFileButton.Size = new System.Drawing.Size(94, 51);
+            this.loadFileButton.TabIndex = 0;
+            this.loadFileButton.Text = "Загрузить файл";
+            this.loadFileButton.UseVisualStyleBackColor = true;
+            this.loadFileButton.Click += new System.EventHandler(this.loadFileButton_Click);
             // 
-            // checkedListBox1
+            // disciplineCheckedList
             // 
-            checkedListBox1.FormattingEnabled = true;
-            checkedListBox1.Location = new Point(98, 26);
-            checkedListBox1.Margin = new Padding(3, 2, 3, 2);
-            checkedListBox1.Name = "checkedListBox1";
-            checkedListBox1.Size = new Size(329, 202);
-            checkedListBox1.TabIndex = 1;
+            this.disciplineCheckedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.disciplineCheckedList.FormattingEnabled = true;
+            this.disciplineCheckedList.Location = new System.Drawing.Point(112, 35);
+            this.disciplineCheckedList.Name = "disciplineCheckedList";
+            this.disciplineCheckedList.Size = new System.Drawing.Size(398, 290);
+            this.disciplineCheckedList.TabIndex = 1;
             // 
-            // button2
+            // generateOutputButton
             // 
-            button2.Location = new Point(157, 248);
-            button2.Margin = new Padding(3, 2, 3, 2);
-            button2.Name = "button2";
-            button2.Size = new Size(221, 22);
-            button2.TabIndex = 2;
-            button2.Text = "Генерация";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            this.generateOutputButton.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.generateOutputButton.Location = new System.Drawing.Point(0, 331);
+            this.generateOutputButton.Name = "generateOutputButton";
+            this.generateOutputButton.Size = new System.Drawing.Size(522, 42);
+            this.generateOutputButton.TabIndex = 2;
+            this.generateOutputButton.Text = "Генерация";
+            this.generateOutputButton.UseVisualStyleBackColor = true;
+            this.generateOutputButton.Click += new System.EventHandler(this.generateOutputButton_Click);
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(98, 9);
-            label1.Name = "label1";
-            label1.Size = new Size(112, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Список дисциплин";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(112, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(140, 20);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Список дисциплин";
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(442, 280);
-            Controls.Add(label1);
-            Controls.Add(button2);
-            Controls.Add(checkedListBox1);
-            Controls.Add(button1);
-            Margin = new Padding(3, 2, 3, 2);
-            Name = "Form1";
-            Text = "Form1";
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(522, 373);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.generateOutputButton);
+            this.Controls.Add(this.disciplineCheckedList);
+            this.Controls.Add(this.loadFileButton);
+            this.MinimumSize = new System.Drawing.Size(540, 420);
+            this.Name = "Form1";
+            this.Text = "Form1";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
 
-        private Button button1;
-        private CheckedListBox checkedListBox1;
-        private Button button2;
+        private Button loadFileButton;
+        private CheckedListBox disciplineCheckedList;
+        private Button generateOutputButton;
         private Label label1;
     }
 }
