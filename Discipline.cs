@@ -36,6 +36,8 @@ namespace WinFormsApp1
             Name = name;
             _semesters = new(semesters);
             _competencies = new(competencies);
+
+            _semesters.Sort((s1, s2) => s1.Num - s2.Num);
         }
 
         public override string ToString()
