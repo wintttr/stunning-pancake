@@ -24,14 +24,20 @@ namespace WinFormsApp1
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            _filePath = path;
+            using ExcelPackage package = new(path);
+
+            _plan = GetPlan(package);
+            _disciplines = GetDisciplines(package);
+            _compDisc = GetCompDescriptions(package);
         }
 
-        public TeachPlan GetPlan()
+        public TeachPlan Plan => _plan;
+        public ReadOnlyCollection<Discipline> Disciplines => _disciplines.AsReadOnly();
+        public ReadOnlyDictionary<string, string> CompDisc => new(_compDisc);
+
+        static private TeachPlan GetPlan(ExcelPackage package)
         {
             static string MatchToRegex(Regex regex, string pattern) => regex.Match(pattern).Groups[1].Value.Trim();
-
-            using var package = new ExcelPackage(new FileInfo(_filePath));
 
             var ws = package.Workbook.Worksheets["Титул"];
 
@@ -50,9 +56,7 @@ namespace WinFormsApp1
             string trainDir = MatchToRegex(trainDirRegex, rawTrainDir);
             string qualification = MatchToRegex(qualRegex, rawQualification);
 
-            return new(trainDir, profile, qualification,
-                       GetDisciplines(package),
-                       GetCompDescriptions(package));
+            return new(trainDir, profile, qualification);
         }
 
         static private bool IsCellEmpty(ExcelRange cellRange)
@@ -138,7 +142,7 @@ namespace WinFormsApp1
         }
 
         static private List<Discipline> GetDisciplines(ExcelPackage excelPackage)
-        {
+        {   
             static HashSet<int> DivideNumbers(string? s)
             {
                 static int CharToDigit(char c)
@@ -185,8 +189,6 @@ namespace WinFormsApp1
                                             throw new ParseErrorException("Discipline name not found");
 
                 double hoursPerZe = GetDoubleFromCell(ws.Cells[row, kHoursPerZE]) ?? 0;
-//                                            throw new ParseErrorException("Hours per ZE not found");
-//                                            ДОЛЖНО БЫТЬ, НО НЕТ
 
                 var exams = DivideNumbers(GetStringFromCell(ws.Cells[row, kExam]));
                 var reports = DivideNumbers(GetStringFromCell(ws.Cells[row, kReport]));
@@ -202,7 +204,6 @@ namespace WinFormsApp1
                     semesters.Add(GetSemester(ws, ControlType.Report, semNum, row));
 
                 string rawCompetenciesString = GetStringFromCell(ws.Cells[row, kCompetencies]) ?? "";
-//                                            throw new ParseErrorException("Competencies not found");
 
                 List<string> competencies = new(rawCompetenciesString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
@@ -226,23 +227,24 @@ namespace WinFormsApp1
 
             for (int row = firstRow; ; row++)
             {
-                if (IsCellEmpty(ws.Cells[row, indexColumn]))
-                    break;
-
-                else if (ws.Cells[row, numberColumn].Merge) 
+                if (ws.Cells[row, numberColumn].Merge)
                 {
-                    string compNumber = GetStringFromCell(ws.Cells[row, numberColumn]) ?? 
+                    string compNumber = GetStringFromCell(ws.Cells[row, numberColumn]) ??
                                                 throw new ParseErrorException("Competency number not found");
-                    string compDescription = GetStringFromCell(ws.Cells[row, descriptionColumn]) ?? 
+                    string compDescription = GetStringFromCell(ws.Cells[row, descriptionColumn]) ??
                                                 throw new ParseErrorException("Competency description not found");
 
                     dict.Add(compNumber, compDescription);
                 }
+                else if (IsCellEmpty(ws.Cells[row, indexColumn]))
+                    break;
             }
 
             return dict;
         }
 
-        private string _filePath;
+        private TeachPlan _plan;
+        private List<Discipline> _disciplines;
+        private Dictionary<string, string> _compDisc;
     }
 }
