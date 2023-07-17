@@ -1,6 +1,6 @@
 ﻿namespace WinFormsApp1
 {
-    partial class Form1
+    partial class StunningPancakeForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -30,8 +30,9 @@
         {
             this.loadFileButton = new System.Windows.Forms.Button();
             this.disciplineCheckedList = new System.Windows.Forms.CheckedListBox();
-            this.generateOutputButton = new System.Windows.Forms.Button();
+            this.saveFileButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // loadFileButton
@@ -55,16 +56,17 @@
             this.disciplineCheckedList.Size = new System.Drawing.Size(398, 290);
             this.disciplineCheckedList.TabIndex = 1;
             // 
-            // generateOutputButton
+            // saveFileButton
             // 
-            this.generateOutputButton.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.generateOutputButton.Location = new System.Drawing.Point(0, 331);
-            this.generateOutputButton.Name = "generateOutputButton";
-            this.generateOutputButton.Size = new System.Drawing.Size(522, 42);
-            this.generateOutputButton.TabIndex = 2;
-            this.generateOutputButton.Text = "Генерация";
-            this.generateOutputButton.UseVisualStyleBackColor = true;
-            this.generateOutputButton.Click += new System.EventHandler(this.generateOutputButton_Click);
+            this.saveFileButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveFileButton.Location = new System.Drawing.Point(0, 331);
+            this.saveFileButton.Name = "saveFileButton";
+            this.saveFileButton.Size = new System.Drawing.Size(522, 50);
+            this.saveFileButton.TabIndex = 2;
+            this.saveFileButton.Text = "Генерация";
+            this.saveFileButton.UseVisualStyleBackColor = true;
+            this.saveFileButton.Click += new System.EventHandler(this.saveFileButton_Click);
             // 
             // label1
             // 
@@ -75,18 +77,27 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Список дисциплин";
             // 
-            // Form1
+            // progressBar
+            // 
+            this.progressBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.progressBar.Location = new System.Drawing.Point(0, 382);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(522, 39);
+            this.progressBar.TabIndex = 4;
+            // 
+            // StunningPancakeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(522, 373);
+            this.ClientSize = new System.Drawing.Size(522, 421);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.generateOutputButton);
+            this.Controls.Add(this.saveFileButton);
             this.Controls.Add(this.disciplineCheckedList);
             this.Controls.Add(this.loadFileButton);
             this.MinimumSize = new System.Drawing.Size(540, 420);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "StunningPancakeForm";
+            this.Text = "stunning-pancake";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -96,7 +107,8 @@
 
         private Button loadFileButton;
         private CheckedListBox disciplineCheckedList;
-        private Button generateOutputButton;
+        private Button saveFileButton;
         private Label label1;
+        private ProgressBar progressBar;
     }
 }
