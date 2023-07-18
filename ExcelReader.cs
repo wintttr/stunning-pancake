@@ -54,7 +54,7 @@ namespace WinFormsApp1
                                             throw new ParseErrorException("Qualification not found");
 
             string trainDir = MatchToRegex(trainDirRegex, rawTrainDir);
-            string qualification = MatchToRegex(qualRegex, rawQualification);
+            string qualification = MatchToRegex(qualRegex, rawQualification).ToLower();
 
             return new(trainDir, profile, qualification);
         }

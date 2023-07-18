@@ -16,7 +16,8 @@ namespace WinFormsApp1
         private TeachPlan _teachPlan;
         private IDictionary<string, string> _compDisc;
 
-        private readonly string _patternPath = "pattern.docx";
+        //private readonly string _patternPath = "pattern.docx";
+        private readonly string _patternPath = "C:\\Users\\Владимир\\Documents\\GitHub\\stunning-pancake\\pattern.docx";
 
         private string _filePath;
 
@@ -89,9 +90,8 @@ namespace WinFormsApp1
             for(int i = 0; i < discipline.Competencies.Count; i++)//0вая строка это шапка
             {
                 compitionTable.AddRow();
-                compitionTable.Rows[i + 1].Cells[0].AddParagraph().AppendText(discipline.Competencies[i]);
-                compitionTable.Rows[i + 1].Cells[1].AddParagraph().AppendText(_compDisc[discipline.Competencies[i]]);
-                compitionTable.ApplyHorizontalMerge(i, 0, 1);
+                compitionTable.Rows[i + 1].Cells[0].AddParagraph().AppendText(discipline.Competencies[i] + ". " + _compDisc[discipline.Competencies[i]]);
+                compitionTable.ApplyHorizontalMerge(i + 1, 0, 1);
             }
 
             //Замена тегов на значение в шаблоне
@@ -100,6 +100,20 @@ namespace WinFormsApp1
                 document.Replace($"#{key}#", _placeDict[key], false, true);
             }
 
+            //вставляем таблици для каждого семестра
+            Section section = document.Sections[0];
+
+            TextSelection selection = document.FindString("#fragment#", true, true);
+            TextRange range = selection.GetAsOneRange();
+            Paragraph paragraph = range.OwnerParagraph;
+            Body body = paragraph.OwnerTextBody;
+            int index = body.ChildObjects.IndexOf(paragraph);
+            foreach(Semester sem in discipline.Semesters)
+            {
+                InsertFragment(section, index, body, sem.Num);
+            }
+            body.ChildObjects.Remove(paragraph);
+            
             document.SaveToFile(_filePath+$"\\{discipline.Name}.docx");
             document.Close();
         }
@@ -161,6 +175,80 @@ namespace WinFormsApp1
                 } 
             }
             return "зачет";
+        }
+
+        private void InsertFragment(Section section, int index, Body body, int num)
+        {
+            Table table = section.AddTable(true);
+            table.ResetCells(14, 7);
+            Dictionary<TableCell, string> data = new Dictionary<TableCell, string>()
+            {
+                {table[0, 0], "№ раздела"},
+                {table[0, 1],  "Наименование разделов"},
+                {table[0, 2], "Количество часов" },
+                {table[1, 2], "Всего" },
+                {table[1, 3], "Аудиторная работа" },
+                {table[2, 3], "Л" },
+                {table[2, 4], "ПЗ" },
+                {table[2, 5], "ЛР" },
+                {table[1, 6], "Внеаудиторная работа" },
+                {table[2, 6], "СРС" }
+
+            };
+
+            table.ApplyVerticalMerge(0, 0, 2);
+            table.ApplyVerticalMerge(1, 0, 2);
+            table.ApplyHorizontalMerge(0, 2, 6);
+            table.ApplyVerticalMerge(2, 1, 2);
+            table.ApplyHorizontalMerge(1, 3, 5);
+
+            table[0, 1].Width = 183.024f;
+
+            foreach (TableCell cell in data.Keys)
+            {
+                cell.AddParagraph().Format.HorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment.Center;
+                cell.CellFormat.VerticalAlignment = VerticalAlignment.Middle;
+                TextRange tr = cell.Paragraphs[0].AppendText(data[cell]);
+                tr.CharacterFormat.FontName = "TimesNewRoman";
+                tr.CharacterFormat.FontSize = 10;
+                tr.CharacterFormat.Bold = true;
+            }
+
+            for (int i = 1; i < 8; i++)
+            {
+                table[3, i - 1].AddParagraph().Format.HorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment.Center;
+                table[3, i - 1].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
+                table[3, i - 1].CellFormat.BackColor = Color.LightGray;
+                table[3, i - 1].Paragraphs[0].AppendText(Convert.ToString(i)).CharacterFormat.FontSize = 10;
+            }
+
+            for (int i = 1; i < 10; i++)
+            {
+                table[i + 3, 0].AddParagraph().Format.HorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment.Center;
+                table[i + 3, 0].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
+                table[i + 3, 0].Paragraphs[0].AppendText(Convert.ToString(i)).CharacterFormat.FontSize = 10;
+            }
+
+            table[13, 1].AddParagraph().Format.HorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment.Left;
+            table[13, 1].CellFormat.VerticalAlignment = VerticalAlignment.Bottom;
+            TextRange tr2 = table[13, 1].Paragraphs[0].AppendText("Итого по дисциплине:");
+            tr2.CharacterFormat.FontSize = 10;
+            tr2.CharacterFormat.Italic = true;
+            tr2.CharacterFormat.Bold = true;
+
+            Paragraph paragraph = section.AddParagraph();
+            TextRange tr3 = paragraph.AppendText($"\tРазделы дисциплины, изучаемые в {num} семестре (очная форма).\n");
+            tr3.CharacterFormat.FontSize = 12;
+            Paragraph paragraph1 = section.AddParagraph();
+            Paragraph paragraph2 = section.AddParagraph();
+            TextRange tr4 = paragraph2.AppendText("Примечание: Л – лекции, ПЗ – практические занятия / семинары, " +
+                "ЛР – лабораторные занятия, КРС – контрольно-самостоятельная работа студента, СРС – самостоятельная работа студента");
+            tr4.CharacterFormat.FontSize = 12;
+
+            body.ChildObjects.Insert(index, paragraph1);
+            body.ChildObjects.Insert(index, paragraph2);
+            body.ChildObjects.Insert(index, table);
+            body.ChildObjects.Insert(index, paragraph);
         }
     }
 }
