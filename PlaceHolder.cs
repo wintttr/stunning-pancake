@@ -108,10 +108,12 @@ namespace WinFormsApp1
             Paragraph paragraph = range.OwnerParagraph;
             Body body = paragraph.OwnerTextBody;
             int index = body.ChildObjects.IndexOf(paragraph);
-            foreach(Semester sem in discipline.Semesters)
+
+            for(int i = discipline.Semesters.Count - 1; i >= 0; i--)
             {
-                InsertFragment(section, index, body, sem.Num);
+                InsertFragment(section, index, body, discipline.Semesters[i].Num);
             }
+
             body.ChildObjects.Remove(paragraph);
             
             document.SaveToFile(_filePath+$"\\{discipline.Name}.docx");
@@ -161,7 +163,10 @@ namespace WinFormsApp1
 
         private string FormatDouble(double d)
         {
-            return d.ToString("0.##");
+            if (d == 0)
+                return "-";
+            else
+                return d.ToString("0.##");
         }
 
         //экзамен или не?
