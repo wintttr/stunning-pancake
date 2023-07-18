@@ -17,7 +17,7 @@ namespace WinFormsApp1
         private IDictionary<string, string> _compDisc;
 
         //private readonly string _patternPath = "pattern.docx";
-        private readonly string _patternPath = "C:\\Users\\Владимир\\Documents\\GitHub\\stunning-pancake\\pattern.docx";
+        private readonly string _patternPath ="../../../pattern.docx";
 
         private string _filePath;
 
@@ -48,7 +48,7 @@ namespace WinFormsApp1
                 {"Name", discipline.Name},
                 {"index", Convert.ToString(discipline.Index)},
                 {"ZETotal", Convert.ToString(discipline.TotalZE)},
-                {"HoursPerZE", Convert.ToString(discipline.HoursPerZE)}
+                {"HoursPerZE", Convert.ToString(discipline.HoursPerZE * discipline.TotalZE)}
             };
 
             //Заполнение таблицы
