@@ -87,11 +87,11 @@ namespace WinFormsApp1
             Table compitionTable = (Table)document.Sections[0].Tables[0];
 
             //Добавить 
+            for (int i = 0; i < discipline.Competencies.Count * 4; i++) compitionTable.AddRow();
             for(int i = 0; i < discipline.Competencies.Count; i++)//0вая строка это шапка
             {
-                compitionTable.AddRow();
-                compitionTable.Rows[i + 1].Cells[0].AddParagraph().AppendText(discipline.Competencies[i] + ". " + _compDisc[discipline.Competencies[i]]);
-                compitionTable.ApplyHorizontalMerge(i + 1, 0, 1);
+                compitionTable.Rows[i * 4 + 1].Cells[0].AddParagraph().AppendText(discipline.Competencies[i] + ". " + _compDisc[discipline.Competencies[i]]);
+                compitionTable.ApplyHorizontalMerge(i * 4 + 1, 0, 1);
             }
 
             //Замена тегов на значение в шаблоне
